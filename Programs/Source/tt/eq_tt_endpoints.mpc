@@ -1,0 +1,30 @@
+# Endpoints (H3 / road, TT) -- do the two trajectories share start and end cell / node?
+#
+#   Party 0 : nA, then MAX_T tokens
+#   Party 1 : nB, then MAX_T tokens
+#   Output  : 1 if start tokens match and end tokens match, else 0
+
+import tt
+
+MAX_T = 20
+
+nA = sint.get_input_from(0)
+a = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    a[i] = sint.get_input_from(0)
+nB = sint.get_input_from(1)
+b = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(j):
+    b[j] = sint.get_input_from(1)
+
+start_timer(1)
+ae = tt.oblivious_at(a, nA - 1)
+be = tt.oblivious_at(b, nB - 1)
+start_match = a[0] == b[0]
+end_match = ae == be
+result = (start_match * end_match).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

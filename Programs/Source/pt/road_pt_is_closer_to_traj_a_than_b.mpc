@@ -1,0 +1,46 @@
+# IsCloser (PT, road) -- does trajectory A pass closer (shortest path) to the source than B?
+#
+# One secure Dijkstra from the source; compares the minimum source-to-trajectory distance.
+#
+#   Public  : n_nodes, then MAX_NODES*MAX_NODES adjacency (mm)
+#   Party 0 : node_p   (source)
+#   Party 1 : nA, A nodes; nB, B nodes
+#   Output  : 1 if A passes closer, else 0
+
+import road_sssp
+import reduce
+
+MAX_T = 20
+MAX_NODES = 50
+INF = 10 ** 9
+
+n_nodes = public_input()
+adj = Matrix(MAX_NODES, MAX_NODES, cint)
+@for_range_opt(MAX_NODES)
+def _(i):
+    @for_range_opt(MAX_NODES)
+    def _(j):
+        adj[i][j] = public_input()
+
+node_p = sint.get_input_from(0)
+nA = sint.get_input_from(1)
+anodes = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    anodes[i] = sint.get_input_from(1)
+nB = sint.get_input_from(1)
+bnodes = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    bnodes[i] = sint.get_input_from(1)
+
+start_timer(1)
+dist, perm = road_sssp.dijkstra(adj, node_p, MAX_NODES)
+rawA = road_sssp.candidate_distances(dist, anodes, perm, MAX_NODES)
+rawB = road_sssp.candidate_distances(dist, bnodes, perm, MAX_NODES)
+dA = reduce.masked(rawA, nA, INF)
+dB = reduce.masked(rawB, nB, INF)
+result = (reduce.min_value(dA) < reduce.min_value(dB)).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

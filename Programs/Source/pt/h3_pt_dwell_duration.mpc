@@ -1,0 +1,39 @@
+# DwellTime (H3) -- total time the trajectory dwells within R hops of the query cell.
+#
+#   Public  : R (hops), delta (min run duration)
+#   Party 0 : ring-ordered disk cells[MAX_CELLS]
+#   Party 1 : n, then MAX_T points (cell, t)
+#   Output  : total dwell time
+
+import h3_disk
+import reduce
+
+MAX_T = 20
+MAX_RADIUS = 10
+MAX_CELLS = h3_disk.ring_size_for(MAX_RADIUS)
+BIG = 10 ** 6
+
+r_hops = public_input()
+delta = public_input()
+disk = Array(MAX_CELLS, sint)
+@for_range(MAX_CELLS)
+def _(i):
+    disk[i] = sint.get_input_from(0)
+n = sint.get_input_from(1)
+cells = Array(MAX_T, sint)
+ts = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    cells[i] = sint.get_input_from(1)
+    ts[i] = sint.get_input_from(1)
+
+start_timer(1)
+raw = h3_disk.candidate_distances(cells, disk, MAX_RADIUS, BIG)
+within = Array(MAX_T, sint)
+@for_range_opt(MAX_T)
+def _(i):
+    within[i] = (raw[i] <= r_hops) * (sint(i) < n)
+result = reduce.dwell_sum(within, ts, delta).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

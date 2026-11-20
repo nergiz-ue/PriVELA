@@ -1,0 +1,24 @@
+# CountInZone (H3 / road, TT) -- how many trajectory points fall in a public zone set.
+#
+#   Public  : ZONE_SIZE zone tokens (cells / nodes)
+#   Party 0 : nA, then MAX_T tokens
+#   Output  : |{p_i in Q : p_i in zone}|
+
+import tt
+
+MAX_T = 20
+ZONE_SIZE = 5
+
+zone = [public_input() for _ in range(ZONE_SIZE)]
+
+nA = sint.get_input_from(0)
+a = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    a[i] = sint.get_input_from(0)
+
+start_timer(1)
+result = tt.count_in_set(a, nA, zone).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

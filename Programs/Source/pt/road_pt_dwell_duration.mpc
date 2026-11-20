@@ -1,0 +1,43 @@
+# DwellTime (road) -- total time the trajectory dwells within R (shortest path) of the source.
+#
+#   Public  : n_nodes, threshold_mm, delta, then MAX_NODES*MAX_NODES adjacency (mm)
+#   Party 0 : node_p   (source)
+#   Party 1 : n, then MAX_T points (node, t)
+#   Output  : total dwell time
+
+import road_sssp
+import reduce
+
+MAX_T = 20
+MAX_NODES = 50
+
+n_nodes = public_input()
+threshold = public_input()
+delta = public_input()
+adj = Matrix(MAX_NODES, MAX_NODES, cint)
+@for_range_opt(MAX_NODES)
+def _(i):
+    @for_range_opt(MAX_NODES)
+    def _(j):
+        adj[i][j] = public_input()
+
+node_p = sint.get_input_from(0)
+n = sint.get_input_from(1)
+nodes = Array(MAX_T, sint)
+ts = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    nodes[i] = sint.get_input_from(1)
+    ts[i] = sint.get_input_from(1)
+
+start_timer(1)
+dist, perm = road_sssp.dijkstra(adj, node_p, MAX_NODES)
+raw = road_sssp.candidate_distances(dist, nodes, perm, MAX_NODES)
+within = Array(MAX_T, sint)
+@for_range_opt(MAX_T)
+def _(i):
+    within[i] = (raw[i] <= threshold) * (sint(i) < n)
+result = reduce.dwell_sum(within, ts, delta).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

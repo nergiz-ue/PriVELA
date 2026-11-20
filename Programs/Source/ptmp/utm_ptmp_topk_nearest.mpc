@@ -1,0 +1,35 @@
+# Top-k (UTM) -- squared distance to the k-th nearest candidate (the k-NN radius).
+#
+# k is public. The kernel extracts the k smallest distances obliviously and reveals the
+# k-th (the k-NN radius), a single-value summary of the top-k selection.
+#
+#   Party 0 : qx, qy
+#   Party 1 : n, then MAX_C candidates (cx, cy)
+#   Output  : squared distance of the k-th nearest candidate
+
+import reduce
+
+MAX_C = 20
+K = 3
+INF = 10 ** 18
+
+qx = sint.get_input_from(0)
+qy = sint.get_input_from(0)
+n = sint.get_input_from(1)
+cx = Array(MAX_C, sint)
+cy = Array(MAX_C, sint)
+@for_range(MAX_C)
+def _(i):
+    cx[i] = sint.get_input_from(1)
+    cy[i] = sint.get_input_from(1)
+
+start_timer(1)
+raw = Array(MAX_C, sint)
+@for_range_opt(MAX_C)
+def _(i):
+    raw[i] = (qx - cx[i]) ** 2 + (qy - cy[i]) ** 2
+d = reduce.masked(raw, n, INF)
+result = reduce.kth_smallest(d, K, INF).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

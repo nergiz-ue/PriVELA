@@ -1,0 +1,25 @@
+# IsInRadius (UTM) -- are two points within R metres of each other?
+#
+# Planar representation: proximity is squared Euclidean distance over scaled-integer UTM
+# coordinates (avoids a secure square root).  d^2 <= R^2.
+#
+#   Public  : R^2 (scaled)
+#   Party 0 : x1, y1   (Alice, scaled UTM)
+#   Party 1 : x2, y2   (Bob,   scaled UTM)
+#   Output  : 1 if within radius else 0
+
+r_squared = public_input()
+
+x1 = sint.get_input_from(0)
+y1 = sint.get_input_from(0)
+x2 = sint.get_input_from(1)
+y2 = sint.get_input_from(1)
+
+start_timer(1)
+dx = x1 - x2
+dy = y1 - y2
+within = (dx * dx + dy * dy) <= r_squared
+result = within.reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

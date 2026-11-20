@@ -1,0 +1,44 @@
+# IsCloser (PT, UTM) -- does trajectory A pass closer to the query than trajectory B?
+#
+# Compares the minimum point-to-trajectory distance: min_i d(p, A_i) < min_j d(p, B_j).
+#
+#   Party 0 : qx, qy
+#   Party 1 : nA, A points (x, y); nB, B points (x, y)
+#   Output  : 1 if A passes closer, else 0
+
+import reduce
+
+MAX_T = 20
+BIG = 10 ** 18
+
+qx = sint.get_input_from(0)
+qy = sint.get_input_from(0)
+
+nA = sint.get_input_from(1)
+ax = Array(MAX_T, sint)
+ay = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    ax[i] = sint.get_input_from(1)
+    ay[i] = sint.get_input_from(1)
+nB = sint.get_input_from(1)
+bx = Array(MAX_T, sint)
+by = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    bx[i] = sint.get_input_from(1)
+    by[i] = sint.get_input_from(1)
+
+start_timer(1)
+rawA = Array(MAX_T, sint)
+rawB = Array(MAX_T, sint)
+@for_range_opt(MAX_T)
+def _(i):
+    rawA[i] = (qx - ax[i]) ** 2 + (qy - ay[i]) ** 2
+    rawB[i] = (qx - bx[i]) ** 2 + (qy - by[i]) ** 2
+dA = reduce.masked(rawA, nA, BIG)
+dB = reduce.masked(rawB, nB, BIG)
+result = (reduce.min_value(dA) < reduce.min_value(dB)).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

@@ -1,0 +1,32 @@
+# Top-k (H3) -- hop distance to the k-th nearest candidate cell (k public).
+#
+#   Party 0 : ring-ordered disk cells[MAX_CELLS]
+#   Party 1 : n, then MAX_C candidate cells
+#   Output  : hop distance of the k-th nearest candidate
+
+import h3_disk
+import reduce
+
+MAX_C = 20
+K = 3
+MAX_RADIUS = 10
+MAX_CELLS = h3_disk.ring_size_for(MAX_RADIUS)
+BIG = 10 ** 6
+
+disk = Array(MAX_CELLS, sint)
+@for_range(MAX_CELLS)
+def _(i):
+    disk[i] = sint.get_input_from(0)
+n = sint.get_input_from(1)
+cand = Array(MAX_C, sint)
+@for_range(MAX_C)
+def _(i):
+    cand[i] = sint.get_input_from(1)
+
+start_timer(1)
+raw = h3_disk.candidate_distances(cand, disk, MAX_RADIUS, BIG)
+d = reduce.masked(raw, n, BIG)
+result = reduce.kth_smallest(d, K, BIG).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

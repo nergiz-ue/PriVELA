@@ -1,0 +1,22 @@
+# IsCloser (UTM) -- is reference point p closer to A than to B?
+#
+# Compares squared Euclidean distances (no square root needed).  d(p,A)^2 < d(p,B)^2.
+#
+#   Party 0 : xp, yp           (reference p, scaled UTM)
+#   Party 1 : xA, yA, xB, yB   (candidates A and B)
+#   Output  : 1 if A is closer than B, else 0
+
+xp = sint.get_input_from(0)
+yp = sint.get_input_from(0)
+xa = sint.get_input_from(1)
+ya = sint.get_input_from(1)
+xb = sint.get_input_from(1)
+yb = sint.get_input_from(1)
+
+start_timer(1)
+da = (xp - xa) ** 2 + (yp - ya) ** 2
+db = (xp - xb) ** 2 + (yp - yb) ** 2
+result = (da < db).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

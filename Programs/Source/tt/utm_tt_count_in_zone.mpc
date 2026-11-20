@@ -1,0 +1,28 @@
+# CountInZone (UTM, TT) -- how many trajectory points fall inside a public bounding box.
+#
+#   Public  : xmin, xmax, ymin, ymax (scaled)
+#   Party 0 : nA, then MAX_T points (x, y)
+#   Output  : |{p_i in Q : p_i inside the zone}|
+
+import tt
+
+MAX_T = 20
+
+xmin = public_input()
+xmax = public_input()
+ymin = public_input()
+ymax = public_input()
+
+nA = sint.get_input_from(0)
+ax = Array(MAX_T, sint)
+ay = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    ax[i] = sint.get_input_from(0)
+    ay[i] = sint.get_input_from(0)
+
+start_timer(1)
+result = tt.count_in_bbox(ax, ay, nA, xmin, xmax, ymin, ymax).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

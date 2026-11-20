@@ -1,0 +1,35 @@
+# IsInRadius (road) -- is the shortest-path distance A->B at most R metres?
+#
+# Road representation: proximity is a secure single-source shortest path over a public
+# adjacency matrix whose node identities are hidden by a secret shuffle
+# (see _helpers/road_sssp.py).  The mm-scaled distance is then thresholded.
+#
+#   Public  : n_nodes, threshold_mm, then MAX_NODES*MAX_NODES adjacency (mm; INF off-graph)
+#   Party 0 : node_a   (Alice's node index into the subgraph)
+#   Party 1 : node_b   (Bob's node index)
+#   Output  : 1 if dist(A,B) <= threshold else 0
+
+import road_sssp
+
+MAX_NODES = 50
+
+n_nodes = public_input()
+threshold = public_input()
+
+adj = Matrix(MAX_NODES, MAX_NODES, cint)
+@for_range_opt(MAX_NODES)
+def _(i):
+    @for_range_opt(MAX_NODES)
+    def _(j):
+        adj[i][j] = public_input()
+
+node_a = sint.get_input_from(0)
+node_b = sint.get_input_from(1)
+
+start_timer(1)
+dist = road_sssp.secure_distance(adj, node_a, node_b, MAX_NODES)
+within = dist <= threshold
+result = within.reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

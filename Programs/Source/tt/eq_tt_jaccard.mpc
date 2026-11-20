@@ -1,0 +1,32 @@
+# Jaccard (H3 / road, TT) -- overlap of visited cells / nodes.
+#
+# Reveals intersection and union counts (two RESULT lines); the client forms the ratio.
+#
+#   Party 0 : nA, then MAX_T tokens
+#   Party 1 : nB, then MAX_T tokens
+#   Output  : RESULT intersection ; RESULT union
+
+import tt
+
+MAX_T = 20
+
+nA = sint.get_input_from(0)
+a = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    a[i] = sint.get_input_from(0)
+nB = sint.get_input_from(1)
+b = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(j):
+    b[j] = sint.get_input_from(1)
+
+start_timer(1)
+M = tt.match_matrix_eq(a, nA, b, nB)
+inter, union = tt.jaccard(M, nA, nB)
+ri = inter.reveal()
+ru = union.reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", ri)
+print_ln("RESULT %s", ru)

@@ -1,0 +1,30 @@
+# CountClose (H3 / road, TT) -- number of co-located cross-trajectory point pairs.
+#
+# Shared by H3 (cell tokens) and road (node tokens): TT proximity reduces to token equality
+# (same cell / same intersection). The only difference is the data written by the client.
+#
+#   Party 0 : nA, then MAX_T tokens
+#   Party 1 : nB, then MAX_T tokens
+#   Output  : |{(a_i, b_j) : a_i == b_j}|
+
+import tt
+
+MAX_T = 20
+
+nA = sint.get_input_from(0)
+a = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    a[i] = sint.get_input_from(0)
+nB = sint.get_input_from(1)
+b = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(j):
+    b[j] = sint.get_input_from(1)
+
+start_timer(1)
+M = tt.match_matrix_eq(a, nA, b, nB)
+result = tt.count_matches(M).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

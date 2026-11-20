@@ -1,0 +1,33 @@
+# IsInRadius (UTM, TT) -- did the two trajectories ever come within R of each other?
+#
+#   Public  : R^2 (scaled)
+#   Party 0 : nA, then MAX_T points (x, y)
+#   Party 1 : nB, then MAX_T points (x, y)
+#   Output  : 1 if any pair is within R, else 0
+
+import tt
+
+MAX_T = 20
+
+r2 = public_input()
+nA = sint.get_input_from(0)
+ax = Array(MAX_T, sint)
+ay = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    ax[i] = sint.get_input_from(0)
+    ay[i] = sint.get_input_from(0)
+nB = sint.get_input_from(1)
+bx = Array(MAX_T, sint)
+by = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(j):
+    bx[j] = sint.get_input_from(1)
+    by[j] = sint.get_input_from(1)
+
+start_timer(1)
+M = tt.match_matrix_dist(ax, ay, nA, bx, by, nB, r2)
+result = tt.any_match(M).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

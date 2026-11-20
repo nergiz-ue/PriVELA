@@ -1,0 +1,39 @@
+# ArgMinDist (road) -- index of the candidate node nearest (shortest path) to the source.
+#
+# One secure Dijkstra from the source; each candidate's distance is read obliviously.
+#
+#   Public  : n_nodes, then MAX_NODES*MAX_NODES adjacency (mm)
+#   Party 0 : node_p   (source)
+#   Party 1 : n, then MAX_C candidate node indices
+#   Output  : index of the closest candidate
+
+import road_sssp
+import reduce
+
+MAX_C = 20
+MAX_NODES = 50
+INF = 10 ** 9
+
+n_nodes = public_input()
+adj = Matrix(MAX_NODES, MAX_NODES, cint)
+@for_range_opt(MAX_NODES)
+def _(i):
+    @for_range_opt(MAX_NODES)
+    def _(j):
+        adj[i][j] = public_input()
+
+node_p = sint.get_input_from(0)
+n = sint.get_input_from(1)
+cand = Array(MAX_C, sint)
+@for_range(MAX_C)
+def _(i):
+    cand[i] = sint.get_input_from(1)
+
+start_timer(1)
+dist, perm = road_sssp.dijkstra(adj, node_p, MAX_NODES)
+raw = road_sssp.candidate_distances(dist, cand, perm, MAX_NODES)
+d = reduce.masked(raw, n, INF)
+result = reduce.argmin_index(d).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

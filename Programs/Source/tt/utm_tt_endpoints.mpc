@@ -1,0 +1,38 @@
+# Endpoints (UTM, TT) -- do the two trajectories share start and end (within R)?
+#
+#   Public  : R^2 (scaled)
+#   Party 0 : nA, then MAX_T points (x, y)
+#   Party 1 : nB, then MAX_T points (x, y)
+#   Output  : 1 if both start and end points match within R, else 0
+
+import tt
+
+MAX_T = 20
+
+r2 = public_input()
+nA = sint.get_input_from(0)
+ax = Array(MAX_T, sint)
+ay = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    ax[i] = sint.get_input_from(0)
+    ay[i] = sint.get_input_from(0)
+nB = sint.get_input_from(1)
+bx = Array(MAX_T, sint)
+by = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(j):
+    bx[j] = sint.get_input_from(1)
+    by[j] = sint.get_input_from(1)
+
+start_timer(1)
+aex = tt.oblivious_at(ax, nA - 1)
+aey = tt.oblivious_at(ay, nA - 1)
+bex = tt.oblivious_at(bx, nB - 1)
+bey = tt.oblivious_at(by, nB - 1)
+start_match = (ax[0] - bx[0]) ** 2 + (ay[0] - by[0]) ** 2 <= r2
+end_match = (aex - bex) ** 2 + (aey - bey) ** 2 <= r2
+result = (start_match * end_match).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

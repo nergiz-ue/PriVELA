@@ -1,0 +1,42 @@
+# IsCloser (PT, H3) -- does trajectory A pass closer (in hops) to the query than trajectory B?
+#
+# Compares min ring distance: min_i hop(p, A_i) < min_j hop(p, B_j). Cells outside the disk
+# count as BIG.
+#
+#   Party 0 : ring-ordered disk cells[MAX_CELLS]
+#   Party 1 : nA, A cells; nB, B cells
+#   Output  : 1 if A passes closer, else 0
+
+import h3_disk
+import reduce
+
+MAX_T = 20
+MAX_RADIUS = 10
+MAX_CELLS = h3_disk.ring_size_for(MAX_RADIUS)
+BIG = 10 ** 6
+
+disk = Array(MAX_CELLS, sint)
+@for_range(MAX_CELLS)
+def _(i):
+    disk[i] = sint.get_input_from(0)
+
+nA = sint.get_input_from(1)
+acells = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    acells[i] = sint.get_input_from(1)
+nB = sint.get_input_from(1)
+bcells = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    bcells[i] = sint.get_input_from(1)
+
+start_timer(1)
+rawA = h3_disk.candidate_distances(acells, disk, MAX_RADIUS, BIG)
+rawB = h3_disk.candidate_distances(bcells, disk, MAX_RADIUS, BIG)
+dA = reduce.masked(rawA, nA, BIG)
+dB = reduce.masked(rawB, nB, BIG)
+result = (reduce.min_value(dA) < reduce.min_value(dB)).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

@@ -1,0 +1,176 @@
+# PriVELA function library.
+#
+# Each top-level key is a function. Per representation it names:
+#   program        MP-SPDZ program path under Programs/Source (no .mpc extension)
+#   inputs         named private-input layout (handled by privela/data.py)
+#   public         named public-input layout, or omitted if none
+#   params         per-rep parameters (merged over the function-level params)
+#   protocols_skip protocols that do not apply to this (function, rep)
+
+# ---------------------------------------------------------------------------
+# PTSP group
+# ---------------------------------------------------------------------------
+is_within_radius:
+  class: ptsp
+  params:
+    radius_m: 500          # proximity threshold in metres
+  reps:
+    utm:
+      program: ptsp/utm_ptsp_is_within_radius
+      inputs: two_points
+      protocols_skip: [semi-bin]
+    h3:
+      program: ptsp/h3_ptsp_is_within_radius
+      inputs: ring_and_cell
+      params:
+        hops: 2
+      protocols_skip: [semi-bin]
+    road:
+      program: ptsp/road_ptsp_is_within_radius
+      inputs: two_nodes
+      params:
+        max_nodes: 50
+        subgraph_radius_m: 2000
+      protocols_skip: [semi-bin, spdz2k]
+
+distance:
+  class: ptsp
+  reps:
+    utm:
+      program: ptsp/utm_ptsp_distance
+      inputs: two_points_d
+      protocols_skip: [semi-bin]
+    h3:
+      program: ptsp/h3_ptsp_distance
+      inputs: disk_and_cell
+      protocols_skip: [semi-bin]
+    road:
+      program: ptsp/road_ptsp_distance
+      inputs: two_nodes_d
+      params: {max_nodes: 50}
+      protocols_skip: [semi-bin, spdz2k]
+
+is_closer_to_a_than_b:
+  class: ptsp
+  reps:
+    utm:
+      program: ptsp/utm_ptsp_is_closer_to_a_than_b
+      inputs: three_points
+      protocols_skip: [semi-bin]
+    h3:
+      program: ptsp/h3_ptsp_is_closer_to_a_than_b
+      inputs: disk_and_two_cells
+      protocols_skip: [semi-bin]
+    road:
+      program: ptsp/road_ptsp_is_closer_to_a_than_b
+      inputs: src_two_targets
+      params: {max_nodes: 50}
+      protocols_skip: [semi-bin, spdz2k]
+
+# ---------------------------------------------------------------------------
+# PTMP group
+# ---------------------------------------------------------------------------
+argmin_distance:
+  class: ptmp
+  reps:
+    utm:  {program: ptmp/utm_ptmp_argmin_distance,  inputs: utm_set,  protocols_skip: [semi-bin]}
+    h3:   {program: ptmp/h3_ptmp_argmin_distance,   inputs: h3_set,   protocols_skip: [semi-bin]}
+    road: {program: ptmp/road_ptmp_argmin_distance, inputs: road_set, params: {max_nodes: 50}, protocols_skip: [semi-bin, spdz2k]}
+
+count_within_radius:
+  class: ptmp
+  reps:
+    utm:  {program: ptmp/utm_ptmp_count_within_radius,  inputs: utm_set_r,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: ptmp/h3_ptmp_count_within_radius,   inputs: h3_set_r,   params: {hops: 2},       protocols_skip: [semi-bin]}
+    road: {program: ptmp/road_ptmp_count_within_radius, inputs: road_set_r, params: {max_nodes: 50, radius_m: 500}, protocols_skip: [semi-bin, spdz2k]}
+
+any_within_radius:
+  class: ptmp
+  reps:
+    utm:  {program: ptmp/utm_ptmp_any_within_radius,  inputs: utm_set_r,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: ptmp/h3_ptmp_any_within_radius,   inputs: h3_set_r,   params: {hops: 2},       protocols_skip: [semi-bin]}
+    road: {program: ptmp/road_ptmp_any_within_radius, inputs: road_set_r, params: {max_nodes: 50, radius_m: 500}, protocols_skip: [semi-bin, spdz2k]}
+
+topk_nearest:
+  class: ptmp
+  params: {k: 3}
+  reps:
+    utm:  {program: ptmp/utm_ptmp_topk_nearest,  inputs: utm_set,  protocols_skip: [semi-bin]}
+    h3:   {program: ptmp/h3_ptmp_topk_nearest,   inputs: h3_set,   protocols_skip: [semi-bin]}
+    road: {program: ptmp/road_ptmp_topk_nearest, inputs: road_set, params: {max_nodes: 50}, protocols_skip: [semi-bin, spdz2k]}
+
+# ---------------------------------------------------------------------------
+# PT group
+# ---------------------------------------------------------------------------
+dwell_duration:
+  class: pt
+  reps:
+    utm:  {program: pt/utm_pt_dwell_duration,  inputs: pt_traj_utm,  params: {radius_m: 500, delta_s: 60}, protocols_skip: [semi-bin]}
+    h3:   {program: pt/h3_pt_dwell_duration,   inputs: pt_traj_h3,   params: {hops: 2, delta_s: 60},       protocols_skip: [semi-bin]}
+    road: {program: pt/road_pt_dwell_duration, inputs: pt_traj_road, params: {max_nodes: 50, radius_m: 500, delta_s: 60}, protocols_skip: [semi-bin, spdz2k]}
+
+entry_count:
+  class: pt
+  reps:
+    utm:  {program: pt/utm_pt_entry_count,  inputs: pt_traj_utm,  params: {radius_m: 500, delta_s: 60}, protocols_skip: [semi-bin]}
+    h3:   {program: pt/h3_pt_entry_count,   inputs: pt_traj_h3,   params: {hops: 2, delta_s: 60},       protocols_skip: [semi-bin]}
+    road: {program: pt/road_pt_entry_count, inputs: pt_traj_road, params: {max_nodes: 50, radius_m: 500, delta_s: 60}, protocols_skip: [semi-bin, spdz2k]}
+
+is_closer_to_traj_a_than_b:
+  class: pt
+  reps:
+    utm:  {program: pt/utm_pt_is_closer_to_traj_a_than_b,  inputs: pt_two_traj_utm,  protocols_skip: [semi-bin]}
+    h3:   {program: pt/h3_pt_is_closer_to_traj_a_than_b,   inputs: pt_two_traj_h3,   protocols_skip: [semi-bin]}
+    road: {program: pt/road_pt_is_closer_to_traj_a_than_b, inputs: pt_two_traj_road, params: {max_nodes: 50}, protocols_skip: [semi-bin, spdz2k]}
+
+# ---------------------------------------------------------------------------
+# TT group
+# ---------------------------------------------------------------------------
+count_close:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_count_close, inputs: tt_pair_utm,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_count_close,  inputs: tt_pair_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_count_close,  inputs: tt_pair_road, protocols_skip: [semi-bin]}
+
+trajectories_within_radius:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_trajectories_within_radius, inputs: tt_pair_utm,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_trajectories_within_radius,  inputs: tt_pair_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_trajectories_within_radius,  inputs: tt_pair_road, protocols_skip: [semi-bin]}
+
+lcss:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_lcss, inputs: tt_pair_utm,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_lcss,  inputs: tt_pair_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_lcss,  inputs: tt_pair_road, protocols_skip: [semi-bin]}
+
+jaccard:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_jaccard, inputs: tt_pair_utm,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_jaccard,  inputs: tt_pair_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_jaccard,  inputs: tt_pair_road, protocols_skip: [semi-bin]}
+
+endpoints:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_endpoints, inputs: tt_pair_utm,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_endpoints,  inputs: tt_pair_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_endpoints,  inputs: tt_pair_road, protocols_skip: [semi-bin]}
+
+common_pois:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_common_pois, inputs: tt_common_utm,  params: {radius_m: 500}, protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_common_pois,  inputs: tt_common_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_common_pois,  inputs: tt_common_road, protocols_skip: [semi-bin]}
+
+count_in_zone:
+  class: tt
+  reps:
+    utm:  {program: tt/utm_tt_count_in_zone, inputs: tt_zone_utm,  protocols_skip: [semi-bin]}
+    h3:   {program: tt/eq_tt_count_in_zone,  inputs: tt_zone_h3,   protocols_skip: [semi-bin]}
+    road: {program: tt/eq_tt_count_in_zone,  inputs: tt_zone_road, protocols_skip: [semi-bin]}

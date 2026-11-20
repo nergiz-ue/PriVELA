@@ -1,0 +1,27 @@
+# IsInRadius (H3 / road, TT) -- did the two trajectories ever co-locate (same cell / node)?
+#
+#   Party 0 : nA, then MAX_T tokens
+#   Party 1 : nB, then MAX_T tokens
+#   Output  : 1 if any pair matches, else 0
+
+import tt
+
+MAX_T = 20
+
+nA = sint.get_input_from(0)
+a = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    a[i] = sint.get_input_from(0)
+nB = sint.get_input_from(1)
+b = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(j):
+    b[j] = sint.get_input_from(1)
+
+start_timer(1)
+M = tt.match_matrix_eq(a, nA, b, nB)
+result = tt.any_match(M).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

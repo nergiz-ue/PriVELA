@@ -1,0 +1,21 @@
+# Distance (UTM) -- exact (squared) Euclidean distance between two points.
+#
+# A secure square root is expensive; for a disclosure function we reveal the squared distance
+# in scaled units and let the client take the root. d^2 = (x1-x2)^2 + (y1-y2)^2.
+#
+#   Party 0 : x1, y1   (scaled UTM)
+#   Party 1 : x2, y2   (scaled UTM)
+#   Output  : squared distance (scaled units)
+
+x1 = sint.get_input_from(0)
+y1 = sint.get_input_from(0)
+x2 = sint.get_input_from(1)
+y2 = sint.get_input_from(1)
+
+start_timer(1)
+dx = x1 - x2
+dy = y1 - y2
+result = (dx * dx + dy * dy).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

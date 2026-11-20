@@ -1,0 +1,38 @@
+# EntryCount (UTM) -- number of times the trajectory enters the R-geofence around the query.
+#
+# Counts outside->inside transitions along the trajectory (see reduce.entry_count). Shares the
+# dwell input layout; delta and timestamps are read but unused.
+#
+#   Public  : R^2 (scaled), delta (unused)
+#   Party 0 : qx, qy
+#   Party 1 : n, then MAX_T points (x, y, t)
+#   Output  : number of geofence entries
+
+import reduce
+
+MAX_T = 20
+
+r_squared = public_input()
+_delta = public_input()
+qx = sint.get_input_from(0)
+qy = sint.get_input_from(0)
+n = sint.get_input_from(1)
+tx = Array(MAX_T, sint)
+ty = Array(MAX_T, sint)
+ts = Array(MAX_T, sint)
+@for_range(MAX_T)
+def _(i):
+    tx[i] = sint.get_input_from(1)
+    ty[i] = sint.get_input_from(1)
+    ts[i] = sint.get_input_from(1)
+
+start_timer(1)
+within = Array(MAX_T, sint)
+@for_range_opt(MAX_T)
+def _(i):
+    d2 = (qx - tx[i]) ** 2 + (qy - ty[i]) ** 2
+    within[i] = (d2 <= r_squared) * (sint(i) < n)
+result = reduce.entry_count(within).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

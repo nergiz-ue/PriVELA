@@ -1,0 +1,32 @@
+# IsCloser (H3) -- is reference cell p closer (in hops) to A than to B?
+#
+# p secret-shares its ring-ordered disk; A and B are looked up by ring distance. A cell
+# outside the disk is treated as distance MAX_RADIUS+1, so out-of-range candidates lose.
+#
+#   Party 0 : ring-ordered disk cells[MAX_CELLS]   (around p)
+#   Party 1 : a_cell, b_cell
+#   Output  : 1 if A is closer than B, else 0
+
+import h3_disk
+
+MAX_RADIUS = 10
+MAX_CELLS = h3_disk.ring_size_for(MAX_RADIUS)   # 331
+OUT = MAX_RADIUS + 1
+
+cells = Array(MAX_CELLS, sint)
+@for_range(MAX_CELLS)
+def _(i):
+    cells[i] = sint.get_input_from(0)
+
+a_cell = sint.get_input_from(1)
+b_cell = sint.get_input_from(1)
+
+start_timer(1)
+da, a_found = h3_disk.ring_distance(a_cell, cells, MAX_RADIUS)
+db, b_found = h3_disk.ring_distance(b_cell, cells, MAX_RADIUS)
+dist_a = a_found.if_else(da, OUT)
+dist_b = b_found.if_else(db, OUT)
+result = (dist_a < dist_b).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

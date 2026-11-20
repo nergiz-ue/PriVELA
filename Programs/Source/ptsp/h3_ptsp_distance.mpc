@@ -1,0 +1,28 @@
+# Distance (H3) -- grid (hop) distance from Alice to Bob's cell.
+#
+# Alice secret-shares her full ring-ordered disk (cells within MAX_RADIUS hops); Bob shares
+# his cell. The distance is the ring label of the matching cell (see _helpers/h3_disk.py), or
+# -1 if Bob lies outside the disk.
+#
+#   Party 0 : ring-ordered disk cells[MAX_CELLS]   (Alice)
+#   Party 1 : bob_cell                             (Bob)
+#   Output  : hop distance, or -1 if beyond MAX_RADIUS
+
+import h3_disk
+
+MAX_RADIUS = 10
+MAX_CELLS = h3_disk.ring_size_for(MAX_RADIUS)   # 331
+
+cells = Array(MAX_CELLS, sint)
+@for_range(MAX_CELLS)
+def _(i):
+    cells[i] = sint.get_input_from(0)
+
+bob_cell = sint.get_input_from(1)
+
+start_timer(1)
+dist, _found = h3_disk.ring_distance(bob_cell, cells, MAX_RADIUS)
+result = dist.reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

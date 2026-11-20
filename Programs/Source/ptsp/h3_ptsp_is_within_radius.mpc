@@ -1,0 +1,29 @@
+# IsInRadius (H3) -- is Bob's cell within R rings of Alice's cell?
+#
+# Grid representation: proximity is set-membership.  Alice secret-shares the precomputed disk
+# of all cells within HOPS rings of her location (size 1+3h(h+1)); Bob secret-shares his cell.
+# Membership reduces to a batched equality test (see _helpers/h3_disk.py).
+#
+#   Party 0 : ring_size, ring_cells[MAX_RING_SIZE]   (Alice's disk, padded)
+#   Party 1 : bob_cell                               (Bob)
+#   Output  : 1 if Bob's cell is in Alice's disk else 0
+
+import h3_disk
+
+HOPS = 2
+MAX_RING_SIZE = h3_disk.ring_size_for(HOPS)   # 19
+
+ring_size = sint.get_input_from(0)
+ring_cells = Array(MAX_RING_SIZE, sint)
+@for_range(MAX_RING_SIZE)
+def _(i):
+    ring_cells[i] = sint.get_input_from(0)
+
+bob_cell = sint.get_input_from(1)
+
+start_timer(1)
+within = h3_disk.in_disk(bob_cell, ring_cells, ring_size)
+result = within.reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

@@ -1,0 +1,31 @@
+# Distance (road) -- shortest-path distance A->B over the road network (in mm).
+#
+# Secure single-source shortest path with a secret node shuffle (see _helpers/road_sssp.py);
+# the distance to B is read obliviously. Reveals the distance value (that is the point).
+#
+#   Public  : n_nodes, then MAX_NODES*MAX_NODES adjacency (mm; INF off-graph)
+#   Party 0 : node_a   (source)
+#   Party 1 : node_b   (target)
+#   Output  : shortest-path distance in mm (INF if unreachable)
+
+import road_sssp
+
+MAX_NODES = 50
+
+n_nodes = public_input()
+
+adj = Matrix(MAX_NODES, MAX_NODES, cint)
+@for_range_opt(MAX_NODES)
+def _(i):
+    @for_range_opt(MAX_NODES)
+    def _(j):
+        adj[i][j] = public_input()
+
+node_a = sint.get_input_from(0)
+node_b = sint.get_input_from(1)
+
+start_timer(1)
+result = road_sssp.secure_distance(adj, node_a, node_b, MAX_NODES).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

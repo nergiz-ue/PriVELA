@@ -1,0 +1,33 @@
+# IsInRadius (UTM, PTMP) -- is at least one candidate within R of the query point?
+#
+#   Public  : R^2 (scaled)
+#   Party 0 : qx, qy
+#   Party 1 : n, then MAX_C candidates (cx, cy)
+#   Output  : 1 if any candidate has d <= R, else 0
+
+import reduce
+
+MAX_C = 20
+INF = 10 ** 18
+
+r_squared = public_input()
+qx = sint.get_input_from(0)
+qy = sint.get_input_from(0)
+n = sint.get_input_from(1)
+cx = Array(MAX_C, sint)
+cy = Array(MAX_C, sint)
+@for_range(MAX_C)
+def _(i):
+    cx[i] = sint.get_input_from(1)
+    cy[i] = sint.get_input_from(1)
+
+start_timer(1)
+raw = Array(MAX_C, sint)
+@for_range_opt(MAX_C)
+def _(i):
+    raw[i] = (qx - cx[i]) ** 2 + (qy - cy[i]) ** 2
+d = reduce.masked(raw, n, INF)
+result = reduce.any_le(d, r_squared).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)

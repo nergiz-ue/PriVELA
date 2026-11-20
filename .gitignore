@@ -1,0 +1,29 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# MP-SPDZ build/run artifacts (generated)
+Programs/Bytecode/
+Programs/Schedules/
+Programs/Public-Input/
+Player-Data/
+logs/
+
+# Benchmark outputs (generated; keep the dir)
+results/*
+!results/.gitkeep
+
+# Large datasets — never commit (sample under data/sample/ is the exception)
+data/raw/
+data/processed/
+*.graphml
+
+# OS
+.DS_Store

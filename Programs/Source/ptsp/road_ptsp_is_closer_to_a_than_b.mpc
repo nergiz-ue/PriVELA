@@ -1,0 +1,35 @@
+# IsCloser (road) -- is source p closer (shortest path) to A than to B?
+#
+# One secure single-source shortest-path run from p (secret shuffle, see _helpers/road_sssp.py);
+# the distances to A and to B are read obliviously and compared. Neither target is revealed.
+#
+#   Public  : n_nodes, then MAX_NODES*MAX_NODES adjacency (mm; INF off-graph)
+#   Party 0 : node_p           (source)
+#   Party 1 : node_a, node_b   (candidates)
+#   Output  : 1 if A is closer than B, else 0
+
+import road_sssp
+
+MAX_NODES = 50
+
+n_nodes = public_input()
+
+adj = Matrix(MAX_NODES, MAX_NODES, cint)
+@for_range_opt(MAX_NODES)
+def _(i):
+    @for_range_opt(MAX_NODES)
+    def _(j):
+        adj[i][j] = public_input()
+
+node_p = sint.get_input_from(0)
+node_a = sint.get_input_from(1)
+node_b = sint.get_input_from(1)
+
+start_timer(1)
+dist, perm = road_sssp.dijkstra(adj, node_p, MAX_NODES)
+da = road_sssp.lookup(dist, node_a, perm, MAX_NODES)
+db = road_sssp.lookup(dist, node_b, perm, MAX_NODES)
+result = (da < db).reveal()
+stop_timer(1)
+
+print_ln("RESULT %s", result)
